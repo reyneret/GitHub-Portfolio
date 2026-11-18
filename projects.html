@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projects · Reyner Elazaro Tampubolon</title>
+  <meta name="description" content="Projects by Reyner Elazaro Tampubolon, from telecom churn modeling and Tokopedia analysis to competition AI apps and Roblox games.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">Reyner Elazaro Tampubolon</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="projects.html" aria-current="page">Projects</a>
+        <a href="education.html">Education</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="page">
+    <div class="page-intro">
+      <p class="kicker">Work</p>
+      <h1>Projects</h1>
+      <p>Eight projects, newest first. The five marked notable are the ones listed on the CV, and each of those links out to the repository, site, or presentation.</p>
+    </div>
+
+    <article class="project" id="telco">
+      <p class="meta">2026 · Notable · with Demas Fadel Anggara</p>
+      <div class="project-top">
+        <h2>Telco Customer Churn Prediction</h2>
+      </div>
+      <p>A supervised binary classifier that estimates the probability a telecom customer has churned, meaning they cancelled the subscription. The work compares six machine learning algorithms, checks class-imbalance treatments, and turns the probability into a contact decision with an explicit cost model.</p>
+      <div class="actions">
+        <a href="https://github.com/demuuus/telco_customer_churn_machine_learning">View project</a>
+      </div>
+
+      <h3>Problem</h3>
+      <p>About one customer in four in the data has churned. A retention team needs a ranking of who is at risk and a rule for how many people to contact. The research question is which customers have a high probability of churn given their profile, services, contract, and charges, and how that probability should become a contact decision.</p>
+
+      <h3>Data</h3>
+      <p>The course dataset has 4,930 customers and 11 columns, with no missing values. The target <em>Churn</em> is Yes for 1,316 customers (26.69%). The ten predictors are Dependents, tenure, OnlineSecurity, OnlineBackup, InternetService, DeviceProtection, TechSupport, Contract, PaperlessBilling, and MonthlyCharges. Seventy-seven exact duplicate rows were kept because the file has no customer identifier. Eight customers with tenure 0 were kept as well.</p>
+      <p>On the training set, month-to-month contracts churn at 43.3%, one-year contracts at 9.9%, and two-year contracts at 2.7%. Customers in their first year churn at 47.9%, against 9.1% for those with 49–72 months of tenure. Fiber-optic customers churn at 42.2%, compared with 18.8% on DSL and 7.6% with no internet. Tenure partly reflects survival: long-tenure customers are partly the people who have not left yet.</p>
+
+      <h3>Method</h3>
+      <p>Encoding and scaling live inside a scikit-learn pipeline so they are fit on training folds only. Binary fields become indicators. Internet service and contract are one-hot encoded. Tenure is log-transformed, then both tenure and monthly charges are standardized. The split is one stratified 80/20 holdout (3,944 train, 986 test, random state 34). Model selection uses stratified 5-fold nested cross-validation: an inner grid search tunes hyperparameters on PR-AUC, and the outer folds produce an out-of-fold prediction for every training customer. The test set was scored once, after the model and threshold were fixed.</p>
+      <p>The six models are logistic regression, decision tree, random forest, histogram gradient boosting, XGBoost, and LightGBM, plus a most-frequent-class dummy. Class weighting, random oversampling, and SMOTENC were compared and not adopted: they moved PR-AUC by at most 0.002 and made calibration worse.</p>
+
+      <h3>Results</h3>
+      <p>Logistic regression has the highest mean nested PR-AUC. XGBoost, LightGBM, and random forest sit within 0.003, inside the fold-to-fold noise, so the selection rule keeps logistic regression for readable coefficients and fewer dependencies. The operating threshold is 0.27, chosen on training out-of-fold predictions to minimize an illustrative cost: 12 months of revenue at risk, a 30% chance a contacted churner is retained, and an offer that costs one month of that customer’s charges.</p>
+      <table class="metrics">
+        <thead>
+          <tr>
+            <th>Evidence</th>
+            <th>PR-AUC</th>
+            <th>ROC-AUC</th>
+            <th>Precision</th>
+            <th>Recall</th>
+            <th>F1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Nested CV, logistic regression</td>
+            <td>0.666 ± 0.027</td>
+            <td>0.846</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Training out-of-fold, threshold 0.27</td>
+            <td>0.658</td>
+            <td>0.844</td>
+            <td>0.519</td>
+            <td>0.806</td>
+            <td>0.631</td>
+          </tr>
+          <tr>
+            <td>Holdout, 986 customers</td>
+            <td>0.685</td>
+            <td>0.854</td>
+            <td>0.516</td>
+            <td>0.810</td>
+            <td>0.630</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>On the holdout the model flags 413 of 986 customers and reaches 213 of 263 churners (true positives 213, false negatives 50, false positives 200, true negatives 523). Recall and ROC-AUC meet the original targets. Precision and F1 do not, and no threshold on any of the six models hits the precision and F1 targets together. That points to the ten features, not to the choice of algorithm.</p>
+      <p>Under the stated cost assumptions, contacting the flagged customers has a lower expected cost than contacting nobody or everybody, about 11.6% below doing nothing on the test sample. The ordering flips when offers are expensive or ineffective. The figures are revenue at risk plus offer spend, not measured profit, and nothing in the project shows that the offer would actually stop churn. That needs a randomized pilot.</p>
+
+      <h3>How to read the model</h3>
+      <p>The dataset has no dates, observation window, or churn timestamp, and tenure is recorded together with the label. The model classifies churn status from historical attributes. It does not establish that it can predict churn before it happens. There is no customer id, validation is internal to one split, and the model rarely flags churners on one- or two-year contracts. The saved pickle used for deployment is refit on all 4,930 rows, so scores on the saved test file are not a fresh test result.</p>
+    </article>
+
+    <article class="project" id="tokopedia">
+      <p class="meta">2026 · Notable · with Muhammad Aldi Riansyah</p>
+      <h2>Tokopedia Promotion Efficiency and User Retention Analysis</h2>
+      <p>A data analysis of Tokopedia activity from January 2023 through December 2024. The brief is to extract insights for promotion budget allocation and user retention: the CLV:CAC ratio was declining, and the repeat-order rate within 90 days had stalled, under aggressive discounts and friction after the first purchase.</p>
+      <div class="actions">
+        <a href="https://github.com/reyneret/Tokopedia-Efficiency-and-Retention-Analysis">View project</a>
+      </div>
+
+      <h3>Data and stack</h3>
+      <p>Five tables were cleaned and checked against each other: transactions (order date, GMV, promo amount, voucher type, payment method, category, campaign flags), users (join date, age, gender, province, device, acquisition channel), deliveries (courier, SLA, actual dates, status, rating), customer-service tickets (category, channel, resolution, CSAT), and sellers (rating, official-store flag, category, response time). Cleaning covered naming, business-logic missing values, duplicate transactions, extreme and negative values, and relational integrity. The stack is Python with Pandas and NumPy, Matplotlib and Seaborn, Tableau, and Jupyter.</p>
+
+      <h3>Findings</h3>
+      <p>Promo repeat-order rate is fairly flat across acquisition channels and demographics, about 68% to 71%. Ads still absorbs the highest promo cost per user and the weakest CLV:CAC proxy, while referral and organic bring healthier long-term value at a lower subsidy. Buyers acquired during major campaign windows (WIB and flash sales) retain worse than regular-day buyers, which fits a wave of seasonal discount seekers. Among voucher types, free shipping keeps the most users at the lowest average subsidy. Electronics and fashion return the most GMV per promo rupiah.</p>
+      <p>Most promotional orders use ordinary discounts and still return healthy GMV. The budget leak is a small slice of extreme discounts, including a checkout hole where the promo amount exceeds the order total. Retention is stuck for a different reason. A failed delivery, an SLA miss, or a support complaint on the first order drops repeat purchase sharply. A first order that arrives on time and generates no complaint reaches about 73.5% repeat-order rate.</p>
+
+      <h3>Recommendations</h3>
+      <p>Cap discounts, require a minimum basket, and block vouchers that exceed the order total. Give first-time buyers a tighter operational path: higher-rated or official stores, stronger couriers, and a fast lane for first-order tickets. Shift campaign spend away from one-off deep cuts toward free-shipping vouchers on the second and third purchase, and move money from ads toward referral. Add schema and business-rule checks so duplicate order ids, negative amounts, and orders dated before the account was created do not re-enter the warehouse.</p>
+    </article>
+
+    <article class="project" id="ngefly">
+      <p class="meta">2026 · Notable</p>
+      <h2>NgeFly</h2>
+      <p>NgeFly is a Python command-line application for airline staff and passengers. It manages flight schedules and ticket reservations with create, read, update, and delete operations, plus search, approval, and a split between admin and passenger menus. The repository is the Flight Ticket Management System.</p>
+      <div class="actions">
+        <a href="https://github.com/reyneret/Flight-Ticket-Management-System">View project</a>
+      </div>
+
+      <h3>Who it is for</h3>
+      <p>Operations staff use it to keep an inventory of flights and to approve or reject bookings. Passengers use it to browse schedules, search, and reserve a seat. The point of the terminal app is accurate itineraries, fewer schedule clashes, and a standard check before a booking is accepted. Tables are printed with <code>tabulate</code>. Passwords are masked with <code>pwinput</code>.</p>
+
+      <h3>What it can do</h3>
+      <p>Admins add flights. Each flight receives an id built from cabin class, origin, destination, and departure date, for example <code>B-JAK-DEN-2026/09/24</code>. Dates must be <code>YYYY/MM/DD</code>, times <code>HH:MM</code>, places <code>City, Country</code>, cabin one of Economy, Business, or First Class, and price a positive integer in rupiah. Duplicate flights are rejected. Passengers create a reservation with full name, date of birth, and email.</p>
+      <p>Anyone can list flights, open one by id, or search by departure date, arrival date, origin, destination, aircraft, cabin, or price. Updates to time, route, aircraft, cabin, or price are shown as a preview and saved only after confirmation. Admins can mark a booking approved or denied. Deleting a flight also asks for confirmation. Login sends the admin account into the control menu and every other account into the passenger menu. Flights and bookings live in nested lists for the session.</p>
+
+      <h3>Run it</h3>
+      <p>Python 3.7 or newer. Clone the repository, install <code>tabulate</code> and <code>pwinput</code>, and start it with <code>python main.py</code>.</p>
+    </article>
+
+    <article class="project" id="clean-news">
+      <p class="meta">2022 · Notable · WAICY AI Excellence</p>
+      <h2>Clean News</h2>
+      <p>Clean News is an AI application that separates real news from hoaxes. It was built together with a research paper that documents how the model was chosen and examines what the application changes for a reader. The project won AI Excellence at the 2022 World Artificial Intelligence Competition for Youth.</p>
+      <div class="actions">
+        <a href="http://clean-news.com">clean-news.com</a>
+        <a href="https://medium.com/waicy/reyner-elazaro-tampubolon-waicy-star-spotlight-series-bd8e7c83eb8c">WAICY spotlight</a>
+      </div>
+      <p>WAICY is a global student competition in which participants apply AI to a real problem. In a 2023 ReadyAI spotlight, Reyner described Clean News as a shift from his 2021 survival tool toward a social problem: telling genuine reporting from fake news. The same piece notes that the competition’s demo videos and stage presentations were where he practiced explaining a model to an audience, which later fed the presentation-coaching work.</p>
+      <p>The public site is <a href="http://clean-news.com">clean-news.com</a>. A public GitHub repository for this project was not found, so the write-up stays with the CV, the award listing, and the ReadyAI interview.</p>
+    </article>
+
+    <article class="project" id="pollution">
+      <p class="meta">2024 · Codeavour 5.0 finalist</p>
+      <h2>Mobile Pollution Dataset</h2>
+      <p>A mobile application that classifies air pollution levels in Indonesian cities and stores those classifications in a dataset. It was developed for Codeavour 5.0.</p>
+      <p>Codeavour is an international artificial intelligence, coding, and robotics competition from STEMpedia, run on the PictoBlox platform. In 2024 more than 200 participants entered the preliminary round, 75 reached the regional round, and 30 advanced to the national round. Reyner was a national finalist with this project.</p>
+      <p>The useful artifact is the dataset as much as the classifier: each city reading is labeled with a pollution level and kept, so later analysis can compare places and times instead of ending at a single on-screen prediction. No public repository or paper was found for this entry.</p>
+    </article>
+
+    <article class="project" id="ocean">
+      <p class="meta">2023 · Code the Ocean · 4th place nationally</p>
+      <h2>Ocean Preservation Roblox Game Series</h2>
+      <p>Three Roblox games that teach ocean preservation to children. The series was developed for Koding Next’s Code the Ocean and placed 4th nationally.</p>
+      <p>Code the Ocean was a national coding competition on marine conservation, open to Indonesian students. More than 1,700 students entered. About 200 became semifinalists and 10 reached the final. The games use Roblox so the lesson sits inside something children already play: Luau, the language listed under Reyner’s skills, is what Roblox experiences are scripted in. The three titles are not published in a public repository, so this page does not invent their individual mechanics. The brief he set is the record: three games, one topic, built for that competition, and a fourth-place national finish.</p>
+    </article>
+
+    <article class="project" id="present-buddy">
+      <p class="meta">2023 · Applied AI</p>
+      <h2>Present Buddy</h2>
+      <p>An AI application that uses gesture recognition to help presenters grade their body language. The user presents, the system reads gestures, and the feedback is a score of how the body is supporting the talk rather than a transcript of the words.</p>
+      <p>In a November 2023 ReadyAI spotlight, Reyner said his then-upcoming WAICY project would take on a problem other competitors kept running into. WAICY scoring depends heavily on demo videos and a main-stage presentation, and he has described those presentations as the place where he learned to explain a model. Present Buddy fits that brief: a tool aimed at the delivery, using gesture recognition, for people who have to present. No award is claimed here, and no public repository was found.</p>
+    </article>
+
+    <article class="project" id="to-eat">
+      <p class="meta">2021 · Notable · WAICY Gold and AI Excellence</p>
+      <h2>To Eat or Not To Eat</h2>
+      <p>An AI-powered checker that tells hikers and survivalists whether a plant is poisonous. The user points the app at a plant; the model classifies it as edible or not. It won Gold and AI Excellence at the 2021 World Artificial Intelligence Competition for Youth.</p>
+      <div class="actions">
+        <a href="https://youtu.be/McGjaKAQ2lE?si=XfhKC0BK4bwfOICW">View presentation</a>
+        <a href="https://medium.com/waicy/reyner-elazaro-tampubolon-waicy-star-spotlight-series-bd8e7c83eb8c">WAICY spotlight</a>
+      </div>
+      <p>ReadyAI’s later profile describes the same project as a plant detector for survival situations, and as the start of Reyner’s WAICY work, before Clean News in 2022. The presentation linked from the CV walks through the application. A public source repository was not found.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Reyner Elazaro Tampubolon</span>
+      <a href="index.html">Back to home</a>
+    </div>
+  </footer>
+</body>
+</html>

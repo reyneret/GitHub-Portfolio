@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact · Reyner Elazaro Tampubolon</title>
+  <meta name="description" content="Contact Reyner Elazaro Tampubolon by phone, email, GitHub, LinkedIn, or the message form.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">Reyner Elazaro Tampubolon</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="education.html">Education</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="page">
+    <div class="page-intro">
+      <p class="kicker">Reach out</p>
+      <h1>Contact</h1>
+      <p>South Tangerang, Banten. The form sends a real email to Reyner.</p>
+    </div>
+
+    <div class="contact-layout">
+      <section class="contact-card" aria-labelledby="details-heading">
+        <h2 id="details-heading">Details</h2>
+        <ul class="contact-list">
+          <li>
+            <span>Phone</span>
+            <a href="tel:+6281806627171">+62 818 0662 7171</a>
+          </li>
+          <li>
+            <span>Email</span>
+            <a href="mailto:reynerelazaro@gmail.com">reynerelazaro@gmail.com</a>
+          </li>
+          <li>
+            <span>GitHub</span>
+            <a href="https://github.com/reyneret">github.com/reyneret</a>
+          </li>
+          <li>
+            <span>LinkedIn</span>
+            <a href="https://www.linkedin.com/in/reyneret/">linkedin.com/in/reyneret</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="form-card" aria-labelledby="form-heading">
+        <h2 id="form-heading">Message me</h2>
+        <p class="form-note">Name, email, subject, and message are sent to reynerelazaro@gmail.com. Replies go back to the address you enter.</p>
+        <form id="message-form" novalidate>
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+
+          <label for="subject">Subject</label>
+          <input id="subject" name="subject" type="text" required>
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+
+          <label class="hp" for="honey" aria-hidden="true">Leave this empty</label>
+          <input class="hp" id="honey" name="honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <button type="submit">Submit</button>
+          <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Reyner Elazaro Tampubolon</span>
+      <a href="index.html">Back to home</a>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>
